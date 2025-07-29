@@ -6,7 +6,7 @@
 
 body {
     font-family: "transducer-condensed", sans-serif;
-    background: #000000 url('/public/CHat.jpeg');
+    background: #000000 url('/Public/CHat.jpeg');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
@@ -45,7 +45,7 @@ body::before {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background: #000000 url('/public/Login.jpeg');
+    background: #000000 url('/Public/Login.jpeg');
     background-size: cover;
     background-position: center;
     background-attachment: fixed;
