@@ -775,6 +775,8 @@ class ChatBot {
                 const doc = await window.db.collection('conversations').doc(conversationId).get();
                 if (doc.exists) {
                     conversation = { id: doc.id, ...doc.data() };
+                    // Add to local conversations array for future reference
+                    this.conversations.push(conversation);
                 }
             } catch (error) {
                 console.error('Error loading conversation:', error);
@@ -843,7 +845,26 @@ class ChatBot {
         
         try {
             const conversationRef = window.db.collection('conversations').doc(this.currentConversationId);
-            const conversation = this.conversations.find(c => c.id === this.currentConversationId) || { messages: [] };
+            
+            // Get current conversation data - either from local or fetch from Firebase
+            let conversation = this.conversations.find(c => c.id === this.currentConversationId);
+            
+            if (!conversation) {
+                // If not found locally, fetch from Firebase to get current state
+                const doc = await conversationRef.get();
+                if (doc.exists) {
+                    conversation = { id: doc.id, ...doc.data() };
+                    // Add to local conversations array
+                    this.conversations.push(conversation);
+                } else {
+                    conversation = { messages: [] };
+                }
+            }
+            
+            // Ensure messages array exists
+            if (!conversation.messages) {
+                conversation.messages = [];
+            }
             
             const newMessages = [
                 ...conversation.messages,
@@ -866,11 +887,9 @@ class ChatBot {
             });
             
             // Update local conversation
-            const localConv = this.conversations.find(c => c.id === this.currentConversationId);
-            if (localConv) {
-                localConv.messages = newMessages;
-                localConv.title = title;
-            }
+            conversation.messages = newMessages;
+            conversation.title = title;
+            
         } catch (error) {
             console.error('Error saving to Firebase:', error);
         }
