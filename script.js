@@ -529,65 +529,7 @@ class ChatBot {
         }
     }
 
-    async getLastConversation() {
-        if (!this.user) return null;
-        
-        try {
-            const querySnapshot = await window.db.collection('conversations')
-                .where('userId', '==', this.user.uid)
-                .orderBy('updatedAt', 'desc')
-                .limit(1)
-                .get();
-                
-            if (!querySnapshot.empty) {
-                const doc = querySnapshot.docs[0];
-                return {
-                    id: doc.id,
-                    ...doc.data()
-                };
-            }
-            return null;
-        } catch (error) {
-            console.error('Error getting last conversation:', error);
-            return null;
-        }
-    }
 
-    showContinueOptions(lastConversation) {
-        const title = lastConversation.title || 'Previous conversation';
-        const messageCount = lastConversation.messages ? Math.floor(lastConversation.messages.length / 2) : 0;
-        
-        this.displayMessage(`Your last conversation was "${title}" with ${messageCount} messages.`, 'assistant');
-        
-        setTimeout(() => {
-            // Create continue/new buttons
-            const optionsDiv = document.createElement('div');
-            optionsDiv.className = 'continue-options';
-            optionsDiv.innerHTML = `
-                <button class="continue-btn" data-id="${lastConversation.id}">Continue Last Conversation</button>
-                <button class="new-conversation-btn-inline">Start New Conversation</button>
-            `;
-            
-            const messageDiv = document.createElement('div');
-            messageDiv.className = 'message assistant-message';
-            messageDiv.appendChild(optionsDiv);
-            this.chatMessages.appendChild(messageDiv);
-            
-            // Add event listeners
-            optionsDiv.querySelector('.continue-btn').addEventListener('click', () => {
-                this.continueConversation(lastConversation);
-                optionsDiv.remove();
-            });
-            
-            optionsDiv.querySelector('.new-conversation-btn-inline').addEventListener('click', () => {
-                this.startNewConversation(false);
-                optionsDiv.remove();
-                this.displayMessage('What client are we talking about today?', 'assistant');
-            });
-            
-            this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
-        }, 2000);
-    }
 
     async continueConversation(conversation) {
         this.currentConversationId = conversation.id;
@@ -687,17 +629,9 @@ class ChatBot {
             // Returning user welcome
             this.displayMessage(`Welcome back, ${firstName}! Ready to continue crafting exceptional experiences?`, 'assistant');
             
-            // Check for last conversation
-            const lastConversation = await this.getLastConversation();
-            if (lastConversation) {
-                setTimeout(() => {
-                    this.showContinueOptions(lastConversation);
-                }, 2000);
-            } else {
-                setTimeout(() => {
-                    this.displayMessage('What client are we talking about today?', 'assistant');
-                }, 2000);
-            }
+            setTimeout(() => {
+                this.displayMessage('You can find your previous conversations in the History section. What client are we talking about today?', 'assistant');
+            }, 2000);
         }
     }
 
