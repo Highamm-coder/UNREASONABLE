@@ -1,0 +1,30 @@
+Firebase Composite Index Requirements
+
+To ensure proper performance for conversation queries, the following composite indexes need to be created in the Firebase Console:
+
+1. Collection: conversations
+   Fields:
+   - userId (Ascending)
+   - updatedAt (Descending)
+   
+   This index is required for the query in script.js line 642-645:
+   ```
+   window.db.collection('conversations')
+     .where('userId', '==', this.user.uid)
+     .orderBy('updatedAt', 'desc')
+   ```
+
+Steps to create in Firebase Console:
+1. Go to Firestore Database > Indexes
+2. Click "Create Index"
+3. Collection ID: conversations
+4. Add field: userId (Ascending)
+5. Add field: updatedAt (Descending)
+6. Click "Create"
+
+Note: Firebase may prompt you to create this index automatically when the query is first executed. You can also use the Firebase CLI command:
+```
+firebase firestore:indexes
+```
+
+This index ensures efficient sorting and filtering of conversations by user and last update time.

@@ -619,7 +619,7 @@ class ChatBot {
             setTimeout(() => {
                 this.displayMessage('Unreasonable transforms your client insights into exceptional experiences, so every gesture, surprise, or thoughtful moment you create builds relationships that last.', 'assistant');
                 setTimeout(() => {
-                    this.displayMessage('What client are we talking about today?', 'assistant');
+                    this.displayMessage('What client or company are we talking about today?', 'assistant');
                 }, 3000);
             }, 2000);
             
@@ -630,7 +630,7 @@ class ChatBot {
             this.displayMessage(`Welcome back, ${firstName}! Ready to continue crafting exceptional experiences?`, 'assistant');
             
             setTimeout(() => {
-                this.displayMessage('You can find your previous conversations in the History section. What client are we talking about today?', 'assistant');
+                this.displayMessage('You can find your previous conversations in the History section. What client or company are we talking about today?', 'assistant');
             }, 2000);
         }
     }
