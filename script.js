@@ -751,7 +751,7 @@ class ChatBot {
             item.addEventListener('click', () => {
                 const conversationId = item.dataset.id;
                 this.loadConversation(conversationId);
-                this.conversationsModal.style.display = 'none';
+                this.showPage('chat');
             });
         });
     }
@@ -794,10 +794,8 @@ class ChatBot {
             const response = await this.callAnthropicAPI(message);
             this.displayMessage(response, 'assistant');
             
-            // Auto-save conversation only after the first user message
-            if (this.userMessageCount === 1) {
-                await this.saveToFirebase(message, response);
-            }
+            // Auto-save conversation after every message exchange
+            await this.saveToFirebase(message, response);
         } catch (error) {
             console.error('Error:', error);
             this.displayMessage(`Error: ${error.message}`, 'assistant', true);
