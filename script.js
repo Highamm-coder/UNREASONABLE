@@ -61,12 +61,29 @@ class ChatBot {
         this.saveApiKeyBtn = document.getElementById('save-api-key');
         this.loading = document.getElementById('loading');
         
-        this.initializeAuth();
+        this.init();
+    }
+
+    async init() {
+        await this.initializeAuth();
         this.initializeEventListeners();
     }
 
-    initializeAuth() {
+    async initializeAuth() {
         console.log('Initializing auth...');
+        
+        // Wait for Firebase to be initialized
+        let attempts = 0;
+        while (!window.auth && attempts < 10) {
+            await new Promise(resolve => setTimeout(resolve, 500));
+            attempts++;
+        }
+        
+        if (!window.auth) {
+            console.error('Firebase auth not initialized after waiting');
+            return;
+        }
+        
         console.log('Auth object:', window.auth);
         
         window.auth.onAuthStateChanged((user) => {

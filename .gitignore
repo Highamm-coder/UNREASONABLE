@@ -11,8 +11,8 @@
 firebase-debug.log
 firebase-debug.*.log
 
-# Firebase config (contains API keys)
-firebase-config.js
+# Firebase config was moved to environment variables
+# firebase-config.js
 
 # Node.js
 node_modules/
