@@ -591,17 +591,23 @@ class ChatBot {
 
     async continueConversation(conversation) {
         this.currentConversationId = conversation.id;
-        this.userMessageCount = conversation.messages ? Math.floor(conversation.messages.filter(m => m.role === 'user').length) : 0;
+        this.userMessageCount = conversation.messages ? conversation.messages.filter(m => m.role === 'user').length : 0;
         this.clearMessages();
         
-        // Load conversation messages
+        // Load conversation messages without typewriter effect
         if (conversation.messages && conversation.messages.length > 0) {
             conversation.messages.forEach(msg => {
                 this.displayMessage(msg.content, msg.role, false, false);
             });
         }
         
-        this.displayMessage('Continuing where we left off. What would you like to discuss next?', 'assistant');
+        // Add continuation message with typewriter effect
+        this.displayMessage('Continuing where we left off. What would you like to discuss next?', 'assistant', false, true);
+        
+        // Scroll to bottom after all messages are loaded
+        setTimeout(() => {
+            this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+        }, 100);
     }
 
     autoResize() {
@@ -760,11 +766,39 @@ class ChatBot {
         this.currentConversationId = conversationId;
         this.clearMessages();
         
-        const conversation = this.conversations.find(c => c.id === conversationId);
-        if (conversation && conversation.messages) {
+        // Find the conversation in our local data
+        let conversation = this.conversations.find(c => c.id === conversationId);
+        
+        // If not found locally, fetch from Firebase
+        if (!conversation) {
+            try {
+                const doc = await window.db.collection('conversations').doc(conversationId).get();
+                if (doc.exists) {
+                    conversation = { id: doc.id, ...doc.data() };
+                }
+            } catch (error) {
+                console.error('Error loading conversation:', error);
+                this.showError('Failed to load conversation');
+                return;
+            }
+        }
+        
+        if (conversation && conversation.messages && conversation.messages.length > 0) {
+            // Update message count for proper saving logic
+            this.userMessageCount = conversation.messages.filter(m => m.role === 'user').length;
+            
+            // Display all previous messages without typewriter effect
             conversation.messages.forEach(msg => {
                 this.displayMessage(msg.content, msg.role, false, false);
             });
+            
+            // Scroll to bottom to show most recent messages
+            setTimeout(() => {
+                this.chatMessages.scrollTop = this.chatMessages.scrollHeight;
+            }, 100);
+        } else {
+            // No messages in conversation yet
+            this.userMessageCount = 0;
         }
     }
 
