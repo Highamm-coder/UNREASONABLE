@@ -6,6 +6,7 @@ class ChatBot {
         this.user = null;
         this.currentConversationId = null;
         this.conversations = [];
+        this.userMessageCount = 0;
         
         this.authContainer = document.getElementById('auth-container');
         this.appContainer = document.getElementById('app-container');
@@ -41,6 +42,7 @@ class ChatBot {
         // Conversations
         this.conversationsList = document.getElementById('conversations-list');
         this.newConversationBtn = document.getElementById('new-conversation-btn');
+        this.newChatBtn = document.getElementById('new-chat-btn');
         
         // Account management
         this.currentPasswordInput = document.getElementById('current-password');
@@ -127,6 +129,10 @@ class ChatBot {
         this.newConversationBtn.addEventListener('click', () => {
             this.startNewConversation();
             this.showPage('chat');
+        });
+        
+        this.newChatBtn.addEventListener('click', () => {
+            this.startNewConversation();
         });
         
         // Account management listeners
@@ -536,6 +542,7 @@ class ChatBot {
 
     async continueConversation(conversation) {
         this.currentConversationId = conversation.id;
+        this.userMessageCount = conversation.messages ? Math.floor(conversation.messages.filter(m => m.role === 'user').length) : 0;
         this.clearMessages();
         
         // Load conversation messages
@@ -579,6 +586,7 @@ class ChatBot {
 
     async startNewConversation(showWelcome = true) {
         this.currentConversationId = null;
+        this.userMessageCount = 0;
         this.clearMessages();
         
         // Create new conversation in Firebase
@@ -728,14 +736,19 @@ class ChatBot {
         this.autoResize();
         this.updateSendButtonState();
 
+        // Increment user message count
+        this.userMessageCount++;
+
         this.showLoading(true);
 
         try {
             const response = await this.callAnthropicAPI(message);
             this.displayMessage(response, 'assistant');
             
-            // Auto-save conversation to Firebase immediately
-            await this.saveToFirebase(message, response);
+            // Auto-save conversation only after the first user message
+            if (this.userMessageCount === 1) {
+                await this.saveToFirebase(message, response);
+            }
         } catch (error) {
             console.error('Error:', error);
             this.displayMessage(`Error: ${error.message}`, 'assistant', true);
