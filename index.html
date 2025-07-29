@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anthropic Workbench Chatbot</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="auth-container" class="auth-container">
+        <div class="auth-content">
+            <h1>UNREASONABLE | DEKSIA</h1>
+            <p>Access with your @deksia.com account to continue</p>
+            
+            <div id="signin-form" class="auth-form">
+                <input type="email" id="signin-email" placeholder="Email (@deksia.com)" class="auth-input">
+                <input type="password" id="signin-password" placeholder="Password" class="auth-input">
+                <div class="auth-buttons">
+                    <button id="signin-btn" class="auth-btn primary">Sign In</button>
+                    <button id="show-create-btn" class="auth-btn secondary">Create Account</button>
+                </div>
+            </div>
+
+            <div id="create-form" class="auth-form hidden">
+                <input type="text" id="create-firstname" placeholder="First Name" class="auth-input">
+                <input type="email" id="create-email" placeholder="Email (@deksia.com)" class="auth-input">
+                <input type="password" id="create-password" placeholder="Password" class="auth-input">
+                <input type="password" id="confirm-password" placeholder="Confirm Password" class="auth-input">
+                <div class="auth-buttons">
+                    <button id="create-btn" class="auth-btn primary">Create Account</button>
+                    <button id="show-signin-btn" class="auth-btn secondary">Back to Sign In</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="app-container" class="container hidden">
+        <header class="header">
+            <h1>UNREASONABLE | DEKSIA</h1>
+            <div class="header-controls">
+                <button id="conversations-btn" class="nav-btn">History</button>
+                <button id="account-btn" class="nav-btn">Account</button>
+                <button id="chat-btn" class="nav-btn active">Chat</button>
+                <button id="logout-btn" class="logout-btn">Sign Out</button>
+            </div>
+        </header>
+
+        <!-- Chat Page -->
+        <div id="chat-page" class="page active">
+            <div class="chat-container">
+                <div id="chat-messages" class="chat-messages">
+                </div>
+            </div>
+
+            <div class="input-container">
+                <textarea id="message-input" placeholder="Enter answers here" rows="1"></textarea>
+                <button id="send-btn" disabled>Send</button>
+            </div>
+
+            <div id="loading" class="loading hidden">
+                <div class="loading-spinner"></div>
+                <span>Claude is thinking...</span>
+            </div>
+        </div>
+
+        <!-- Conversations History Page -->
+        <div id="history-page" class="page">
+            <div class="page-content">
+                <div class="page-header">
+                    <h2>Conversation History</h2>
+                    <button id="new-conversation-btn" class="primary-btn">New Conversation</button>
+                </div>
+                <div id="conversations-list" class="conversations-list">
+                    <div class="loading">Loading conversations...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Account Management Page -->
+        <div id="account-page" class="page">
+            <div class="page-content">
+                <div class="page-header">
+                    <h2>Account Settings</h2>
+                </div>
+                <div class="settings-sections">
+                    <div class="settings-section">
+                        <h3>Change Password</h3>
+                        <div class="setting-group">
+                            <input type="password" id="current-password" placeholder="Current Password" class="setting-input">
+                            <input type="password" id="new-password" placeholder="New Password" class="setting-input">
+                            <input type="password" id="confirm-new-password" placeholder="Confirm New Password" class="setting-input">
+                            <button id="change-password-btn" class="primary-btn">Update Password</button>
+                        </div>
+                    </div>
+                    <div class="settings-section">
+                        <h3>Account Information</h3>
+                        <div class="account-info">
+                            <p><strong>Name:</strong> <span id="user-name">-</span></p>
+                            <p><strong>Email:</strong> <span id="user-email">-</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase CDN -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics-compat.js"></script>
+    
+    <script src="firebase-config.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
