@@ -88,6 +88,20 @@ body::before {
     line-height: 1.6;
 }
 
+.auth-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+}
+
+.auth-loading.hidden {
+    display: none;
+}
+
 .auth-form {
     display: flex;
     flex-direction: column;
@@ -155,6 +169,21 @@ body::before {
 
 .auth-btn.primary:hover {
     background: linear-gradient(135deg, rgba(102, 126, 234, 0.8), rgba(118, 75, 162, 0.8));
+}
+
+.auth-btn:disabled,
+.auth-btn.disabled {
+    background: rgba(255, 255, 255, 0.05) !important;
+    color: rgba(255, 255, 255, 0.3) !important;
+    cursor: not-allowed !important;
+    opacity: 0.5;
+}
+
+.auth-btn:disabled:hover,
+.auth-btn.disabled:hover {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    transform: none !important;
 }
 
 .hidden {

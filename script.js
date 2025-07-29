@@ -7,6 +7,7 @@ class ChatBot {
         this.currentConversationId = null;
         this.conversations = [];
         this.userMessageCount = 0;
+        this.firebaseReady = false;
         
         this.authContainer = document.getElementById('auth-container');
         this.appContainer = document.getElementById('app-container');
@@ -43,6 +44,7 @@ class ChatBot {
         this.conversationsList = document.getElementById('conversations-list');
         this.newConversationBtn = document.getElementById('new-conversation-btn');
         this.newChatBtn = document.getElementById('new-chat-btn');
+        this.authLoading = document.getElementById('auth-loading');
         
         // Account management
         this.currentPasswordInput = document.getElementById('current-password');
@@ -72,19 +74,26 @@ class ChatBot {
     async initializeAuth() {
         console.log('Initializing auth...');
         
+        // Disable auth buttons until Firebase is ready
+        this.setAuthButtonsEnabled(false);
+        
         // Wait for Firebase to be initialized
         let attempts = 0;
-        while (!window.auth && attempts < 10) {
+        while (!window.auth && attempts < 20) {
             await new Promise(resolve => setTimeout(resolve, 500));
             attempts++;
         }
         
         if (!window.auth) {
             console.error('Firebase auth not initialized after waiting');
+            this.showError('Failed to initialize authentication. Please refresh the page.');
             return;
         }
         
         console.log('Auth object:', window.auth);
+        this.firebaseReady = true;
+        this.setAuthButtonsEnabled(true);
+        this.authLoading?.classList.add('hidden');
         
         window.auth.onAuthStateChanged((user) => {
             console.log('Auth state changed:', user);
@@ -107,6 +116,19 @@ class ChatBot {
                 this.appContainer.classList.add('hidden');
             }
         });
+    }
+
+    setAuthButtonsEnabled(enabled) {
+        if (this.signinBtn) this.signinBtn.disabled = !enabled;
+        if (this.createBtn) this.createBtn.disabled = !enabled;
+        
+        if (enabled) {
+            this.signinBtn?.classList.remove('disabled');
+            this.createBtn?.classList.remove('disabled');
+        } else {
+            this.signinBtn?.classList.add('disabled');
+            this.createBtn?.classList.add('disabled');
+        }
     }
 
     initializeEventListeners() {
@@ -231,6 +253,11 @@ class ChatBot {
     }
 
     async signIn() {
+        if (!this.firebaseReady || !window.auth) {
+            this.showError('Authentication system is still loading. Please wait a moment and try again.');
+            return;
+        }
+
         const email = this.signinEmail.value.trim();
         const password = this.signinPassword.value;
 
@@ -277,6 +304,11 @@ class ChatBot {
     }
 
     async createAccount() {
+        if (!this.firebaseReady || !window.auth) {
+            this.showError('Authentication system is still loading. Please wait a moment and try again.');
+            return;
+        }
+
         const firstName = this.createFirstName.value.trim();
         const email = this.createEmail.value.trim();
         const password = this.createPassword.value;
