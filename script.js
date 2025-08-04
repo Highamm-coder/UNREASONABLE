@@ -839,12 +839,42 @@ class ChatBot {
     }
 
     async callAnthropicAPI(message) {
+        // Get conversation history from current conversation
+        let conversationHistory = [];
+        
+        if (this.currentConversationId) {
+            let conversation = this.conversations.find(c => c.id === this.currentConversationId);
+            
+            // If not found locally, fetch from Firebase
+            if (!conversation) {
+                try {
+                    const doc = await window.db.collection('conversations').doc(this.currentConversationId).get();
+                    if (doc.exists) {
+                        conversation = { id: doc.id, ...doc.data() };
+                        this.conversations.push(conversation);
+                    }
+                } catch (error) {
+                    console.error('Error fetching conversation for API call:', error);
+                }
+            }
+            
+            if (conversation && conversation.messages) {
+                conversationHistory = conversation.messages.map(msg => ({
+                    role: msg.role,
+                    content: msg.content
+                }));
+            }
+        }
+        
         const response = await fetch('/api/chat', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ message })
+            body: JSON.stringify({ 
+                message,
+                conversationHistory 
+            })
         });
 
         if (!response.ok) {

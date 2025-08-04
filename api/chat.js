@@ -21,7 +21,7 @@ module.exports = async function handler(req, res) {
     }
     
     try {
-        const { message } = req.body;
+        const { message, conversationHistory = [] } = req.body;
         
         const systemPrompt = `You are Unreasonable, Deksia's hospitality thinking coach. You help team members create exceptional experiences for ONE SPECIFIC PERSON OR COMPANY by guiding their thinking. You never provide solutions - you develop their ability to create thoughtful gestures.
 
@@ -88,18 +88,35 @@ Before closing, one final question: "Does this serve [Name/Company], represent y
 
 Context: You are talking to members of the Deksia team.``;
         
+        // Build messages array from conversation history
+        const messages = [];
+        
+        // Add conversation history
+        conversationHistory.forEach(msg => {
+            messages.push({
+                role: msg.role,
+                content: [{
+                    type: 'text',
+                    text: msg.content
+                }]
+            });
+        });
+        
+        // Add current message
+        messages.push({
+            role: 'user',
+            content: [{
+                type: 'text',
+                text: message
+            }]
+        });
+        
         const response = await anthropic.messages.create({
             model: 'claude-sonnet-4-20250514',
             max_tokens: 20000,
             temperature: 1,
             system: systemPrompt,
-            messages: [{
-                role: 'user',
-                content: [{
-                    type: 'text',
-                    text: message
-                }]
-            }]
+            messages: messages
         });
 
         res.status(200).json({ response: response.content[0].text });
